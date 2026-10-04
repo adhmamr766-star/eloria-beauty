@@ -1,853 +1,1069 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eloria Beauty — Botanical Skincare & Organic Elixirs</title>
+    <title>روعة البشرة | Glow SkinCare</title>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
+    
+    <!-- Google Fonts: Cairo & Tajawal -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Alpine.js for interactive state management -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        botanical: {
-                            50: '#f4f7f4',
-                            100: '#e5ebe5',
-                            200: '#cdd9cd',
-                            600: '#3e5c46',
-                            700: '#2d4534',
-                            800: '#1f3024',
-                            900: '#131f17',
+                        rose: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                        },
+                        cream: {
+                            50: '#faf8f5',
+                            100: '#f4efe6',
+                            200: '#e8ddcb',
+                        },
+                        mint: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
                         },
                         gold: {
-                            100: '#fbf4e8',
-                            300: '#e5cd9b',
-                            400: '#d8b975',
-                            500: '#c5a059',
-                            600: '#a37e3c',
-                        },
-                        cream: '#FAF7F2',
-                        sand: '#F2ECE1',
+                            DEFAULT: '#d4af37',
+                            light: '#f3e5ab',
+                        }
                     },
                     fontFamily: {
-                        serif: ['"Cormorant Garamond"', 'serif'],
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'glow': '0 0 25px -5px rgba(197, 160, 89, 0.3)',
-                        'soft': '0 10px 30px -10px rgba(45, 69, 52, 0.08)',
+                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-    
+
+    <!-- Custom CSS Styles -->
     <style>
         body {
-            background-color: #FAF7F2;
-            color: #1f3024;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Cairo', sans-serif;
+            background-color: #faf8f5;
+            color: #332d2b;
             overflow-x: hidden;
         }
-        .font-serif-title {
-            font-family: 'Cormorant Garamond', serif;
+        
+        .smooth-scroll {
+            scroll-behavior: smooth;
         }
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #d8b975 0%, #a37e3c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .gold-bg-gradient {
-            background: linear-gradient(135deg, #d8b975 0%, #c5a059 100%);
-        }
-        .glass-nav {
-            background: rgba(250, 247, 242, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(229, 205, 155, 0.3);
-        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #FAF7F2;
+            background: #f4efe6;
         }
         ::-webkit-scrollbar-thumb {
-            background: #cdd9cd;
+            background: #fda4af;
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #3e5c46;
+            background: #fb7185;
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Badge pulse animation */
+        @keyframes badge-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .pulse-badge {
+            animation: badge-pulse 0.3s ease-in-out;
         }
     </style>
 </head>
-<body class="relative min-h-screen flex flex-col">
+<body x-data="shopApp()" class="smooth-scroll flex flex-col min-h-screen">
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed top-24 right-5 z-50 transform translate-x-72 opacity-0 transition-all duration-300 ease-out flex items-center gap-3 bg-botanical-800 text-white px-5 py-3.5 rounded-2xl shadow-xl border border-gold-400/30">
-        <div class="bg-gold-500 text-botanical-900 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">✓</div>
-        <div>
-            <p id="toast-title" class="font-semibold text-sm">Added to Bag</p>
-            <p id="toast-msg" class="text-xs text-botanical-200">Your botanical glow awaits.</p>
-        </div>
+    <div class="bg-gradient-to-r from-rose-400 via-rose-300 to-rose-400 text-white text-center py-2 px-4 text-xs md:text-sm font-semibold tracking-wide shadow-sm">
+        <i class="fas fa-gift ml-2"></i>
+        شحن مجاني للطلبات الأكبر من 350 جنيه | استخدم كود <span class="bg-white text-rose-500 px-2 py-0.5 rounded-full font-bold mx-1">GLOW2026</span> للحصول على خصم 15%
     </div>
 
-    <!-- Announcement Bar -->
-    <div class="bg-botanical-800 text-gold-300 text-xs py-2 px-4 text-center font-medium tracking-wider uppercase">
-        ✨ Free Worldwide Botanical Express Shipping on Orders Over $75
-    </div>
-
-    <!-- Header Navigation -->
-    <header class="sticky top-0 z-40 glass-nav border-b border-gold-300/20 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-btn" class="lg:hidden text-botanical-800 text-2xl focus:outline-none p-2">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-
-            <!-- Brand Logo -->
-            <a href="#" class="flex items-center gap-2 group">
-                <div class="w-9 h-9 rounded-full gold-bg-gradient flex items-center justify-center text-botanical-900 font-serif font-bold text-xl shadow-glow group-hover:scale-105 transition-transform">
-                    E
+    <header class="sticky top-0 z-40 glass border-b border-rose-100/60 shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-gray-700 hover:text-rose-500 focus:outline-none">
+                        <i class="fas" :class="mobileMenuOpen ? 'fa-times text-xl' : 'fa-bars text-xl'"></i>
+                    </button>
+                    <a href="#" class="flex items-center gap-2 group">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-400 to-rose-200 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                            <i class="fas fa-sparkles text-lg"></i>
+                        </div>
+                        <span class="text-2xl font-black bg-gradient-to-r from-rose-600 via-rose-500 to-rose-400 bg-clip-text text-transparent font-tajawal">
+                            جلو سكين<span class="text-xs block font-normal text-gray-500 tracking-widest -mt-1">GLOW SKINCARE</span>
+                        </span>
+                    </a>
                 </div>
-                <span class="font-serif-title text-2xl sm:text-3xl font-semibold tracking-wide text-botanical-900">
-                    Eloria <span class="text-gold-600 italic font-normal">Beauty</span>
-                </span>
-            </a>
 
-            <!-- Desktop Navigation Links -->
-            <nav class="hidden lg:flex items-center space-x-8 text-sm font-medium text-botanical-800 tracking-wide">
-                <a href="#home" class="hover:text-gold-600 transition-colors py-1 border-b-2 border-gold-500">Home</a>
-                <a href="#shop" class="hover:text-gold-600 transition-colors py-1 border-b-2 border-transparent">Shop</a>
-                <a href="#about" class="hover:text-gold-600 transition-colors py-1 border-b-2 border-transparent">Our Story</a>
-                <a href="#ingredients" class="hover:text-gold-600 transition-colors py-1 border-b-2 border-transparent">Botanicals</a>
-                <a href="#reviews" class="hover:text-gold-600 transition-colors py-1 border-b-2 border-transparent">Reviews</a>
-            </nav>
+                <!-- Navigation Links (Desktop) -->
+                <nav class="hidden md:flex space-x-reverse space-x-8 font-medium text-gray-700">
+                    <a href="#featured" class="hover:text-rose-500 transition-colors py-2 border-b-2 border-transparent hover:border-rose-400">الرئيسية</a>
+                    <a href="#products" @click="selectedCategory = 'all'" class="hover:text-rose-500 transition-colors py-2 border-b-2 border-transparent hover:border-rose-400">المنتجات</a>
+                    <a href="#products" @click="selectedCategory = 'face'" class="hover:text-rose-500 transition-colors py-2 border-b-2 border-transparent hover:border-rose-400">العناية بالوجه</a>
+                    <a href="#products" @click="selectedCategory = 'serum'" class="hover:text-rose-500 transition-colors py-2 border-b-2 border-transparent hover:border-rose-400">السيروم</a>
+                    <a href="#products" @click="selectedCategory = 'sunscreen'" class="hover:text-rose-500 transition-colors py-2 border-b-2 border-transparent hover:border-rose-400">واقي الشمس</a>
+                    <a href="#quiz" class="text-rose-600 font-bold hover:text-rose-700 transition-colors py-2 flex items-center gap-1">
+                        <i class="fas fa-wand-magic-sparkles text-sm"></i>
+                        مستشار البشرة
+                    </a>
+                </nav>
 
-            <!-- Header Action Icons -->
-            <div class="flex items-center space-x-4 sm:space-x-6 text-botanical-800">
-                <button class="hover:text-gold-600 transition-colors p-2" title="Search">
-                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
-                </button>
-                <button id="wishlist-btn" class="hover:text-gold-600 transition-colors p-2 relative" title="Wishlist">
-                    <i class="fa-regular fa-heart text-lg"></i>
-                    <span id="wishlist-badge" class="absolute top-1 right-1 w-2 h-2 bg-gold-500 rounded-full hidden"></span>
-                </button>
-                <button id="cart-btn" class="hover:text-gold-600 transition-colors p-2 relative bg-botanical-100 hover:bg-botanical-200 rounded-full w-10 h-10 flex items-center justify-center transition-all">
-                    <i class="fa-solid fa-bag-shopping text-lg"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-gold-500 text-botanical-900 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">0</span>
-                </button>
+                <!-- Search & Actions -->
+                <div class="flex items-center gap-3">
+                    <!-- Search Input (Desktop) -->
+                    <div class="relative hidden sm:block w-48 lg:w-64">
+                        <input type="text" x-model="searchQuery" placeholder="ابحثي عن منتج..." 
+                            class="w-full pl-9 pr-4 py-2 text-sm bg-rose-50/50 border border-rose-200 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white transition-all">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-rose-300"></i>
+                    </div>
+
+                    <!-- Cart Trigger Button -->
+                    <button @click="cartOpen = true" class="relative p-2.5 text-gray-700 hover:text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-full transition-all focus:outline-none shadow-sm">
+                        <i class="fas fa-shopping-bag text-lg"></i>
+                        <span x-show="cartCount > 0" x-text="cartCount" 
+                            class="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Bar Mobile -->
+            <div class="sm:hidden pb-3 pt-1">
+                <div class="relative w-full">
+                    <input type="text" x-model="searchQuery" placeholder="ابحثي عن منتج..." 
+                        class="w-full pl-9 pr-4 py-2 text-sm bg-rose-50/60 border border-rose-200 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-400">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-rose-300"></i>
+                </div>
             </div>
         </div>
 
-        <!-- Mobile Drawer Menu -->
-        <div id="mobile-menu" class="hidden lg:hidden bg-cream border-b border-gold-300/30 px-6 py-6 space-y-4">
-            <a href="#home" class="block text-lg font-medium text-botanical-800 hover:text-gold-600">Home</a>
-            <a href="#shop" class="block text-lg font-medium text-botanical-800 hover:text-gold-600">Shop Collection</a>
-            <a href="#about" class="block text-lg font-medium text-botanical-800 hover:text-gold-600">Our Story</a>
-            <a href="#ingredients" class="block text-lg font-medium text-botanical-800 hover:text-gold-600">Botanical Ingredients</a>
-            <a href="#reviews" class="block text-lg font-medium text-botanical-800 hover:text-gold-600">Customer Reviews</a>
+        <!-- Mobile Navigation Menu -->
+        <div x-show="mobileMenuOpen" x-transition class="md:hidden bg-white border-b border-rose-100 px-4 pt-2 pb-4 space-y-2">
+            <a href="#featured" @click="mobileMenuOpen = false" class="block py-2 text-gray-700 hover:text-rose-500 font-medium">الرئيسية</a>
+            <a href="#products" @click="selectedCategory = 'all'; mobileMenuOpen = false" class="block py-2 text-gray-700 hover:text-rose-500 font-medium">جميع المنتجات</a>
+            <a href="#products" @click="selectedCategory = 'face'; mobileMenuOpen = false" class="block py-2 text-gray-700 hover:text-rose-500 font-medium">العناية بالوجه</a>
+            <a href="#products" @click="selectedCategory = 'serum'; mobileMenuOpen = false" class="block py-2 text-gray-700 hover:text-rose-500 font-medium">السيروم والرطوبة</a>
+            <a href="#products" @click="selectedCategory = 'sunscreen'; mobileMenuOpen = false" class="block py-2 text-gray-700 hover:text-rose-500 font-medium">واقي الشمس</a>
+            <a href="#products" @click="selectedCategory = 'body'; mobileMenuOpen = false" class="block py-2 text-gray-700 hover:text-rose-500 font-medium">العناية بالجسم</a>
+            <a href="#quiz" @click="mobileMenuOpen = false" class="block py-2 text-rose-600 font-bold">اختبار تحديد نوع البشرة</a>
         </div>
     </header>
 
-    <main class="flex-grow">
-        <!-- Hero Section -->
-        <section id="home" class="relative pt-8 pb-20 lg:pt-16 lg:pb-32 overflow-hidden">
-            <!-- Background Decorative Glows -->
-            <div class="absolute top-1/4 left-10 w-96 h-96 bg-gold-300/20 rounded-full blur-3xl -z-10 pointer-events-none"></div>
-            <div class="absolute bottom-10 right-10 w-96 h-96 bg-botanical-200/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
-
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+    <section id="featured" class="relative overflow-hidden bg-gradient-to-b from-rose-100/50 via-cream-50 to-cream-50 py-12 md:py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                
+                <!-- Hero Content -->
+                <div class="space-y-6 text-center md:text-right">
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-200/60 text-rose-800 text-xs sm:text-sm font-semibold tracking-wide">
+                        <i class="fas fa-sparkles text-rose-500"></i> تركيبات طبيعية 100% ومعتمدة
+                    </span>
+                    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
+                        إشراقة طبيعية <br>
+                        <span class="bg-gradient-to-r from-rose-500 via-rose-400 to-rose-600 bg-clip-text text-transparent">تُبرز جمال بشرتك النقي</span>
+                    </h1>
+                    <p class="text-gray-600 text-base sm:text-lg max-w-xl mx-auto md:mx-0 leading-relaxed">
+                        اكتشفي تشكيلتنا الفاخرة المبتكرة خصيصاً لتغدية جميع أنواع البشرة، المصممة بأعلى معايير الجودة بمكونات طبيعية تمنحك النضارة والترطيب الذي تستحقينه.
+                    </p>
                     
-                    <!-- Hero Content -->
-                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
-                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold-100 border border-gold-300/40 text-gold-600 text-xs font-semibold tracking-wider uppercase">
-                            <i class="fa-solid fa-sparkles"></i> Pure Botanical Skincare
-                        </div>
-                        <h1 class="font-serif-title text-4xl sm:text-6xl lg:text-7xl font-light text-botanical-900 leading-[1.15]">
-                            Unlock Your Skin's <br class="hidden sm:inline">
-                            <span class="italic font-normal gold-gradient-text">Natural Radiance</span>
-                        </h1>
-                        <p class="text-base sm:text-lg text-botanical-700/80 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                            Pure botanical elixirs crafted with nature's finest rare plants and bio-active botanicals. Experience timeless transformation for healthy, glowing skin.
-                        </p>
-                        
-                        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
-                            <a href="#shop" class="w-full sm:w-auto px-8 py-4 rounded-full gold-bg-gradient text-botanical-900 font-semibold shadow-glow hover:shadow-lg hover:scale-[1.02] transition-all text-center">
-                                Shop Collection <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
-                            </a>
-                            <a href="#ingredients" class="w-full sm:w-auto px-8 py-4 rounded-full border border-botanical-600 text-botanical-800 font-medium hover:bg-botanical-600 hover:text-white transition-all text-center">
-                                Explore Botanicals
-                            </a>
-                        </div>
+                    <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-4">
+                        <a href="#products" class="w-full sm:w-auto text-center px-8 py-4 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                            <span>تسوقي الآن</span>
+                            <i class="fas fa-arrow-left text-sm"></i>
+                        </a>
+                        <a href="#quiz" class="w-full sm:w-auto text-center px-8 py-4 bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold rounded-full shadow-sm transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-wand-magic-sparkles text-rose-400"></i>
+                            <span>اعرفي نوع بشرتك</span>
+                        </a>
+                    </div>
 
-                        <!-- Stats / Social Proof -->
-                        <div class="pt-8 border-t border-gold-300/30 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0">
-                            <div>
-                                <p class="font-serif-title text-2xl sm:text-3xl font-semibold text-botanical-900">100%</p>
-                                <p class="text-xs text-botanical-600 uppercase tracking-wider">Organic & Vegan</p>
+                    <!-- Trust Stats -->
+                    <div class="pt-8 border-t border-rose-200/60 grid grid-cols-3 gap-4 text-center md:text-right">
+                        <div>
+                            <p class="text-2xl font-bold text-gray-800">+10,000</p>
+                            <p class="text-xs text-gray-500">عميلة سعيدة</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-gray-800">100%</p>
+                            <p class="text-xs text-gray-500">منتجات أصلية</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-gray-800">4.9 ★</p>
+                            <p class="text-xs text-gray-500">تقييم العملاء</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Image Showcase -->
+                <div class="relative flex justify-center">
+                    <div class="absolute -inset-4 bg-gradient-to-r from-rose-300 to-rose-200 rounded-full blur-2xl opacity-40 animate-pulse"></div>
+                    <div class="relative bg-white/40 p-4 rounded-3xl border border-white/60 shadow-2xl backdrop-blur-sm max-w-md">
+                        <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80" 
+                             alt="منتجات العناية بالبشرة" 
+                             class="rounded-2xl object-cover h-[380px] sm:h-[450px] w-full shadow-md"
+                             onerror="this.src='https://placehold.co/600x800/fecdd3/881337?text=Glow+SkinCare'">
+                        
+                        <!-- Floating Badge -->
+                        <div class="absolute -bottom-5 -right-5 bg-white p-4 rounded-2xl shadow-xl border border-rose-100 flex items-center gap-3">
+                            <div class="w-12 h-12 bg-mint-100 rounded-full flex items-center justify-center text-mint-500 text-xl font-bold">
+                                <i class="fas fa-leaf"></i>
                             </div>
                             <div>
-                                <p class="font-serif-title text-2xl sm:text-3xl font-semibold text-botanical-900">50k+</p>
-                                <p class="text-xs text-botanical-600 uppercase tracking-wider">Glowing Users</p>
-                            </div>
-                            <div>
-                                <p class="font-serif-title text-2xl sm:text-3xl font-semibold text-botanical-900">4.9★</p>
-                                <p class="text-xs text-botanical-600 uppercase tracking-wider">Top Rating</p>
+                                <p class="text-xs text-gray-500">تركيبة متطورة</p>
+                                <p class="text-sm font-bold text-gray-800">خالي من Parabens & Sulfate</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Hero Visual / Featured Bottle Card -->
-                    <div class="lg:col-span-5 relative flex justify-center">
-                        <div class="relative w-full max-w-md">
-                            <!-- Floating Decorative Badge -->
-                            <div class="absolute -top-6 -left-6 z-20 glass-card p-4 rounded-2xl shadow-soft animate-bounce" style="animation-duration: 4s;">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-gold-100 flex items-center justify-center text-gold-600">
-                                        <i class="fa-solid fa-award text-lg"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-semibold text-botanical-900">Best Serum 2026</p>
-                                        <p class="text-[10px] text-botanical-600">Beauty Awards Winner</p>
-                                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-10 bg-white border-y border-rose-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                
+                <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-rose-50/50 transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xl flex-shrink-0">
+                        <i class="fas fa-truck-fast"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-800">توصيل سريع</h4>
+                        <p class="text-xs text-gray-500">خلال 24-48 ساعة لجميع المحافظات</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-rose-50/50 transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xl flex-shrink-0">
+                        <i class="fas fa-shield-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-800">منتجات أصلية 100%</h4>
+                        <p class="text-xs text-gray-500">مضمونة ومفحوصة طبياً</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-rose-50/50 transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xl flex-shrink-0">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-800">الدفع عند الاستلام</h4>
+                        <p class="text-xs text-gray-500">أو عن طريق بطاقات الائتمان</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-rose-50/50 transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xl flex-shrink-0">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-800">دعم متواصل</h4>
+                        <p class="text-xs text-gray-500">استشارات مجانية مع خبراء البشرة</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="quiz" class="py-14 bg-gradient-to-r from-rose-50 via-cream-100 to-rose-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-rose-100 text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-rose-200/40 rounded-full blur-2xl"></div>
+                <div class="absolute bottom-0 left-0 w-32 h-32 bg-rose-300/30 rounded-full blur-2xl"></div>
+
+                <span class="inline-block px-3 py-1 bg-rose-100 text-rose-600 rounded-full text-xs font-bold mb-3">
+                    <i class="fas fa-lightbulb ml-1"></i> أداة تحليل البشرة
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-2">مستشار البشرة الذكي</h2>
+                <p class="text-gray-600 text-sm mb-8">اختاري نوع بشرتك للحصول على توصية فورية بالمنتجات الأكثر ملاءمة احتياجاتك</p>
+
+                <!-- Skin Type Selector Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                    <template x-for="type in skinTypes" :key="type.id">
+                        <button @click="quizSkinType = type.id" 
+                            :class="quizSkinType === type.id ? 'border-rose-500 bg-rose-50 ring-2 ring-rose-300' : 'border-gray-200 bg-white hover:border-rose-200'"
+                            class="p-4 rounded-2xl border transition-all text-center flex flex-col items-center justify-center gap-2 group">
+                            <span class="text-3xl" x-text="type.icon"></span>
+                            <span class="font-bold text-sm text-gray-800 group-hover:text-rose-600" x-text="type.name"></span>
+                            <span class="text-xs text-gray-500" x-text="type.desc"></span>
+                        </button>
+                    </template>
+                </div>
+
+                <!-- Quiz Recommendation Result -->
+                <div x-show="quizSkinType !== null" x-transition class="p-6 bg-rose-50/70 rounded-2xl border border-rose-200/60 text-right">
+                    <h4 class="font-bold text-rose-800 text-lg mb-2 flex items-center gap-2">
+                        <i class="fas fa-check-circle text-rose-500"></i>
+                        التوصية المخصصة لبشرتك (<span x-text="getSkinTypeName(quizSkinType)"></span>):
+                    </h4>
+                    <p class="text-sm text-gray-600 mb-4" x-text="getSkinTypeAdvice(quizSkinType)"></p>
+                    
+                    <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+                        <button @click="filterBySkinType(quizSkinType)" class="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-sm font-bold transition-all shadow-md">
+                            عرض المنتجات الموصى بها (<span x-text="getRecommendedProducts(quizSkinType).length"></span>)
+                        </button>
+                        <button @click="quizSkinType = null" class="text-xs text-gray-500 hover:text-rose-600 underline">إعادة الاختبار</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="products" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-grow">
+        
+        <!-- Section Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+                <span class="text-rose-500 text-xs font-bold uppercase tracking-wider">مجموعتنا الحصرية</span>
+                <h2 class="text-3xl font-extrabold text-gray-900 mt-1">منتجات العناية بالبشرة</h2>
+            </div>
+
+            <!-- Categories Tabs -->
+            <div class="flex flex-wrap gap-2">
+                <button @click="selectedCategory = 'all'" 
+                    :class="selectedCategory === 'all' ? 'bg-rose-500 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-rose-50 border border-gray-200'"
+                    class="px-4 py-2 rounded-full text-sm font-medium transition-all">الكل</button>
+                <button @click="selectedCategory = 'face'" 
+                    :class="selectedCategory === 'face' ? 'bg-rose-500 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-rose-50 border border-gray-200'"
+                    class="px-4 py-2 rounded-full text-sm font-medium transition-all">العناية بالوجه</button>
+                <button @click="selectedCategory = 'serum'" 
+                    :class="selectedCategory === 'serum' ? 'bg-rose-500 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-rose-50 border border-gray-200'"
+                    class="px-4 py-2 rounded-full text-sm font-medium transition-all">سيروم ورطوبة</button>
+                <button @click="selectedCategory = 'sunscreen'" 
+                    :class="selectedCategory === 'sunscreen' ? 'bg-rose-500 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-rose-50 border border-gray-200'"
+                    class="px-4 py-2 rounded-full text-sm font-medium transition-all">واقي الشمس</button>
+                <button @click="selectedCategory = 'body'" 
+                    :class="selectedCategory === 'body' ? 'bg-rose-500 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-rose-50 border border-gray-200'"
+                    class="px-4 py-2 rounded-full text-sm font-medium transition-all">العناية بالجسم</button>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <template x-for="product in filteredProducts" :key="product.id">
+                <div class="bg-white rounded-3xl overflow-hidden border border-rose-100 hover:border-rose-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
+                    
+                    <!-- Product Image Container -->
+                    <div class="relative overflow-hidden bg-rose-50/30 h-64 cursor-pointer" @click="openQuickView(product)">
+                        <img :src="product.image" :alt="product.title" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             onerror="this.src='https://placehold.co/400x500/fecdd3/881337?text=Glow+Skin'">
+                        
+                        <!-- Discount Badge -->
+                        <template x-if="product.discount">
+                            <span class="absolute top-3 right-3 bg-rose-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md"
+                                  x-text="'-' + product.discount + '%'"></span>
+                        </template>
+
+                        <!-- Best Seller Tag -->
+                        <template x-if="product.isBestSeller">
+                            <span class="absolute top-3 left-3 bg-amber-400 text-gray-900 text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
+                                <i class="fas fa-crown text-xs ml-1"></i> الأكثر مبيعاً
+                            </span>
+                        </template>
+
+                        <!-- Quick View Hover Overlay -->
+                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="bg-white/90 text-gray-800 text-xs font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-sm">
+                                <i class="fas fa-eye ml-1"></i> معاينة السريعة
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Product Content -->
+                    <div class="p-5 flex-grow flex flex-col justify-between">
+                        <div>
+                            <!-- Category & Rating -->
+                            <div class="flex items-center justify-between text-xs mb-2">
+                                <span class="text-rose-500 font-semibold" x-text="getCategoryLabel(product.category)"></span>
+                                <div class="flex items-center text-amber-400">
+                                    <i class="fas fa-star text-xs"></i>
+                                    <span class="text-gray-600 font-bold mr-1" x-text="product.rating"></span>
+                                    <span class="text-gray-400 text-[10px]" x-text="'(' + product.reviewsCount + ')'"></span>
                                 </div>
                             </div>
 
-                            <!-- Main Product Card Visual -->
-                            <div class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-gold-300/30 bg-sand group">
-                                <img src="https://images.unsplash.com/photo-1608248597266-c89a9f99e436?auto=format&fit=crop&w=800&q=80" 
-                                     alt="Elixir of Radiance Bottle" 
-                                     class="w-full h-[450px] object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                                     onerror="this.src='https://placehold.co/600x800/2d4534/d8b975?text=Eloria+Radiance+Serum'">
+                            <!-- Title -->
+                            <h3 class="font-bold text-gray-800 text-base mb-1 hover:text-rose-500 cursor-pointer transition-colors" 
+                                @click="openQuickView(product)" 
+                                x-text="product.title"></h3>
+                            
+                            <!-- Benefits snippet -->
+                            <p class="text-xs text-gray-500 line-clamp-2 mb-3" x-text="product.benefits"></p>
+                        </div>
+
+                        <!-- Price & Add to Cart Action -->
+                        <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-2">
+                            <div>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="font-extrabold text-rose-600 text-lg" x-text="product.price"></span>
+                                    <span class="text-xs font-medium text-gray-500">ج.م</span>
+                                </div>
+                                <template x-if="product.originalPrice">
+                                    <span class="text-xs text-gray-400 line-through" x-text="product.originalPrice + ' ج.م'"></span>
+                                </template>
+                            </div>
+
+                            <button @click="addToCart(product)" 
+                                    class="p-2.5 bg-rose-100 hover:bg-rose-500 text-rose-600 hover:text-white rounded-2xl transition-all duration-200 active:scale-95 shadow-sm">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Empty State Search Result -->
+        <div x-show="filteredProducts.length === 0" class="text-center py-16">
+            <i class="fas fa-search text-5xl text-rose-200 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-700">لم نتمكن من العثور على منتجات</h3>
+            <p class="text-sm text-gray-500 mt-1">جربي البحث بكلمات أخرى أو اختر فئة مختلفة</p>
+            <button @click="searchQuery = ''; selectedCategory = 'all'" class="mt-4 px-6 py-2 bg-rose-500 text-white rounded-full text-sm font-bold">
+                إعادة ضبط البحث
+            </button>
+        </div>
+
+    </section>
+
+    <section class="py-14 bg-white border-t border-rose-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <span class="text-rose-500 text-xs font-bold uppercase">تجارب حقيقية</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-800 mt-1">ماذا تقول خبيرات الجمال عن منتجاتنا؟</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <div class="bg-rose-50/40 p-6 rounded-3xl border border-rose-100 relative">
+                    <div class="flex items-center gap-1 text-amber-400 mb-3">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-sm text-gray-700 leading-relaxed mb-4">"سيروم الهيالورونيك أسيد غير روتين العناية بوجودتي تماماً! بشرتي أصبحت أكثر ترطيباً ونضارة من أول أسبوع."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-rose-200 flex items-center justify-center font-bold text-rose-700">
+                            س
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-800">سارة محمود</p>
+                            <p class="text-xs text-gray-400">عميلة موثوقة</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-rose-50/40 p-6 rounded-3xl border border-rose-100 relative">
+                    <div class="flex items-center gap-1 text-amber-400 mb-3">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-sm text-gray-700 leading-relaxed mb-4">"واقي الشمس خفيف جداً ولا يترك أي طبقة بيضاء، ممتزة جداً تحت المكياج وأنصح به لجميع صاحبات البشرة الدهنية."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-rose-200 flex items-center justify-center font-bold text-rose-700">
+                            ن
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-800">نورهان علي</p>
+                            <p class="text-xs text-gray-400">عميلة موثوقة</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-rose-50/40 p-6 rounded-3xl border border-rose-100 relative">
+                    <div class="flex items-center gap-1 text-amber-400 mb-3">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-sm text-gray-700 leading-relaxed mb-4">"سرعة الشحن والتغليف الأنيق جداً أعجبوني، والمنتجات جودتها عالية وبدون معطرات صناعية تسبب حساسية."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-rose-200 flex items-center justify-center font-bold text-rose-700">
+                            م
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-800">مريم كمال</p>
+                            <p class="text-xs text-gray-400">عميلة موثوقة</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <div x-show="cartOpen" class="relative z-50" x-cloak>
+        <!-- Overlay -->
+        <div x-show="cartOpen" x-transition.opacity class="fixed inset-0 bg-black/40 backdrop-blur-sm" @click="cartOpen = false"></div>
+
+        <div class="fixed inset-y-0 left-0 max-w-full flex">
+            <div x-show="cartOpen" x-transition:enter="transform transition ease-in-out duration-300"
+                 x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transform transition ease-in-out duration-300"
+                 x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
+                 class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+                
+                <!-- Cart Header -->
+                <div class="p-5 border-b border-rose-100 flex items-center justify-between bg-rose-50/50">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-shopping-bag text-rose-500 text-lg"></i>
+                        <h3 class="font-extrabold text-gray-800 text-lg">سلة التسوق (<span x-text="cartCount"></span>)</h3>
+                    </div>
+                    <button @click="cartOpen = false" class="text-gray-400 hover:text-gray-600 p-1">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Cart Items List -->
+                <div class="flex-grow overflow-y-auto p-5 space-y-4">
+                    <template x-if="cart.length === 0">
+                        <div class="text-center py-12">
+                            <i class="fas fa-basket-shopping text-5xl text-rose-200 mb-3"></i>
+                            <p class="text-gray-500 text-sm">سلتك فارغة حالياً</p>
+                            <button @click="cartOpen = false" class="mt-4 px-6 py-2 bg-rose-500 text-white rounded-full text-xs font-bold">
+                                ابدأي التسوق
+                            </button>
+                        </div>
+                    </template>
+
+                    <template x-for="item in cart" :key="item.id">
+                        <div class="flex gap-4 p-3 bg-rose-50/30 rounded-2xl border border-rose-100/60 items-center">
+                            <img :src="item.image" :alt="item.title" class="w-16 h-16 object-cover rounded-xl border border-white">
+                            <div class="flex-grow">
+                                <h4 class="font-bold text-sm text-gray-800 line-clamp-1" x-text="item.title"></h4>
+                                <p class="text-xs text-rose-600 font-bold mt-1" x-text="item.price + ' ج.م'"></p>
                                 
-                                <div class="absolute inset-0 bg-gradient-to-t from-botanical-900/80 via-transparent to-transparent"></div>
-                                
-                                <div class="absolute bottom-0 left-0 right-0 p-6 text-white space-y-2">
-                                    <div class="flex justify-between items-end">
-                                        <div>
-                                            <span class="text-xs uppercase tracking-widest text-gold-300">Flagship Elixir</span>
-                                            <h3 class="font-serif-title text-2xl font-medium">Elixir of Radiance</h3>
-                                            <p class="text-xs text-botanical-200">Botanic Serum • 30ml</p>
-                                        </div>
-                                        <span class="font-serif-title text-2xl text-gold-300 font-bold">$48.00</span>
-                                    </div>
-                                    <button onclick="addToCart('p1')" class="w-full mt-3 py-3 rounded-xl gold-bg-gradient text-botanical-900 font-semibold text-sm shadow hover:brightness-110 transition-all flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-plus"></i> Quick Add to Bag
+                                <!-- Quantity Controls -->
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button @click="updateQuantity(item.id, -1)" class="w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs text-gray-600 hover:bg-rose-100">
+                                        <i class="fas fa-minus text-[10px]"></i>
+                                    </button>
+                                    <span class="text-xs font-bold text-gray-700 w-4 text-center" x-text="item.quantity"></span>
+                                    <button @click="updateQuantity(item.id, 1)" class="w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs text-gray-600 hover:bg-rose-100">
+                                        <i class="fas fa-plus text-[10px]"></i>
                                     </button>
                                 </div>
                             </div>
+                            <button @click="removeFromCart(item.id)" class="text-gray-400 hover:text-rose-500 p-1">
+                                <i class="fas fa-trash-can text-sm"></i>
+                            </button>
                         </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Brand Badges Section -->
-        <section class="py-10 bg-botanical-800 text-gold-100 border-y border-gold-400/20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                    <div class="flex flex-col items-center space-y-2">
-                        <i class="fa-solid fa-leaf text-2xl text-gold-400"></i>
-                        <h4 class="font-serif-title text-lg font-medium">100% Organic & Vegan</h4>
-                        <p class="text-xs text-botanical-200">Pure plant-derived ingredients</p>
-                    </div>
-                    <div class="flex flex-col items-center space-y-2">
-                        <i class="fa-solid fa-paw text-2xl text-gold-400"></i>
-                        <h4 class="font-serif-title text-lg font-medium">Cruelty-Free</h4>
-                        <p class="text-xs text-botanical-200">Never tested on animals</p>
-                    </div>
-                    <div class="flex flex-col items-center space-y-2">
-                        <i class="fa-solid fa-microscope text-2xl text-gold-400"></i>
-                        <h4 class="font-serif-title text-lg font-medium">Dermatologist Tested</h4>
-                        <p class="text-xs text-botanical-200">Clinically proven formulas</p>
-                    </div>
-                    <div class="flex flex-col items-center space-y-2">
-                        <i class="fa-solid fa-recycle text-2xl text-gold-400"></i>
-                        <h4 class="font-serif-title text-lg font-medium">Sustainable Glass</h4>
-                        <p class="text-xs text-botanical-200">Eco-conscious packaging</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Shop / Featured Products Section -->
-        <section id="shop" class="py-20 lg:py-28">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
-                <!-- Section Title -->
-                <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
-                    <span class="text-xs uppercase tracking-widest text-gold-600 font-semibold">Botanical Collection</span>
-                    <h2 class="font-serif-title text-3xl sm:text-5xl font-light text-botanical-900">Curated Skincare Essentials</h2>
-                    <p class="text-sm text-botanical-700/80">Each formula is thoughtfully crafted with cold-pressed botanical extracts and nutrient-rich oils.</p>
+                    </template>
                 </div>
 
-                <!-- Filter Tabs -->
-                <div class="flex justify-center items-center gap-2 sm:gap-4 mb-12 flex-wrap text-sm">
-                    <button onclick="filterProducts('all')" class="filter-btn active px-5 py-2.5 rounded-full bg-botanical-800 text-white font-medium shadow-sm transition-all">All Products</button>
-                    <button onclick="filterProducts('serum')" class="filter-btn px-5 py-2.5 rounded-full bg-white text-botanical-800 border border-botanical-200 hover:border-gold-500 font-medium transition-all">Serums</button>
-                    <button onclick="filterProducts('moisturizer')" class="filter-btn px-5 py-2.5 rounded-full bg-white text-botanical-800 border border-botanical-200 hover:border-gold-500 font-medium transition-all">Moisturizers</button>
-                    <button onclick="filterProducts('mask')" class="filter-btn px-5 py-2.5 rounded-full bg-white text-botanical-800 border border-botanical-200 hover:border-gold-500 font-medium transition-all">Masks & Oils</button>
-                </div>
-
-                <!-- Product Grid -->
-                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Products will be injected by JavaScript -->
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Brand Story Section -->
-        <section id="about" class="py-20 bg-sand/60 border-y border-gold-300/20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                    
-                    <div class="lg:col-span-6 relative">
-                        <div class="relative rounded-3xl overflow-hidden shadow-xl border border-gold-300/30">
-                            <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80" 
-                                 alt="Eloria Botanical Lab" 
-                                 class="w-full h-[500px] object-cover"
-                                 onerror="this.src='https://placehold.co/800x600/3e5c46/ffffff?text=Eloria+Botanical+Lab'">
-                        </div>
-                        <div class="absolute -bottom-6 -right-6 glass-card p-6 rounded-2xl hidden sm:block max-w-xs shadow-soft">
-                            <p class="font-serif-title text-lg italic text-botanical-900">"Nature holds the secret to eternal vitality. We simply bottle it."</p>
-                            <p class="text-xs text-gold-600 mt-2 font-medium">— Eloria Founder</p>
-                        </div>
+                <!-- Cart Footer & Total Summary -->
+                <div x-show="cart.length > 0" class="p-5 border-t border-rose-100 bg-white space-y-3">
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>المجموع الفرعي:</span>
+                        <span class="font-bold text-gray-800" x-text="cartSubtotal + ' ج.م'"></span>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>مصاريف الشحن:</span>
+                        <span class="font-bold text-mint-500" x-text="cartSubtotal >= 350 ? 'مجاني' : '35 ج.م'"></span>
+                    </div>
+                    <div class="flex justify-between text-base font-extrabold text-gray-900 pt-2 border-t border-gray-100">
+                        <span>الإجمالي:</span>
+                        <span class="text-rose-600" x-text="cartTotal + ' ج.م'"></span>
                     </div>
 
-                    <div class="lg:col-span-6 space-y-6">
-                        <span class="text-xs uppercase tracking-widest text-gold-600 font-semibold">Our Philosophy</span>
-                        <h2 class="font-serif-title text-3xl sm:text-5xl font-light text-botanical-900 leading-tight">Born from Wild Earth & Pure Alchemy</h2>
-                        <p class="text-botanical-700/90 text-sm sm:text-base leading-relaxed">
-                            At **Eloria Beauty**, we believe skincare should be an enchanting daily ritual, not a chore. We harvest potent botanical extracts at their peak potency, blending centuries of botanical wisdom with cutting-edge green science.
-                        </p>
-                        <p class="text-botanical-700/90 text-sm sm:text-base leading-relaxed">
-                            Free from synthetic fragrances, parabens, and harsh fillers. Only pure, transformative botanicals designed to nourish, heal, and illuminate your skin.
-                        </p>
-
-                        <div class="pt-4 grid grid-cols-2 gap-4 text-sm font-medium text-botanical-900">
-                            <div class="flex items-center gap-3">
-                                <span class="w-2 h-2 rounded-full bg-gold-500"></span> Sustainably Wild-Harvested
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="w-2 h-2 rounded-full bg-gold-500"></span> Cold-Pressed Active Oils
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="w-2 h-2 rounded-full bg-gold-500"></span> Zero Synthetic Additives
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="w-2 h-2 rounded-full bg-gold-500"></span> Eco-Conscious Packaging
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Botanical Ingredients Interactive Showcase -->
-        <section id="ingredients" class="py-20 lg:py-28">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
-                    <span class="text-xs uppercase tracking-widest text-gold-600 font-semibold">Key Botanicals</span>
-                    <h2 class="font-serif-title text-3xl sm:text-5xl font-light text-botanical-900">Powerhouse Ingredients</h2>
-                    <p class="text-sm text-botanical-700/80">Hover over our core natural ingredients to discover their skin benefits.</p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Ingredient 1 -->
-                    <div class="bg-white rounded-2xl p-6 border border-gold-300/20 shadow-soft hover:shadow-glow hover:-translate-y-1 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-gold-100 flex items-center justify-center text-gold-600 mb-4 text-xl">
-                            <i class="fa-solid fa-seedling"></i>
-                        </div>
-                        <h3 class="font-serif-title text-xl font-semibold text-botanical-900">Wild Rosehip Oil</h3>
-                        <p class="text-xs text-gold-600 font-medium mb-2">Rich in Vitamin A & C</p>
-                        <p class="text-xs text-botanical-700 leading-relaxed">Boosts collagen production, fades hyperpigmentation, and delivers deep cellular hydration.</p>
-                    </div>
-
-                    <!-- Ingredient 2 -->
-                    <div class="bg-white rounded-2xl p-6 border border-gold-300/20 shadow-soft hover:shadow-glow hover:-translate-y-1 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-gold-100 flex items-center justify-center text-gold-600 mb-4 text-xl">
-                            <i class="fa-solid fa-spa"></i>
-                        </div>
-                        <h3 class="font-serif-title text-xl font-semibold text-botanical-900">French Lavender</h3>
-                        <p class="text-xs text-gold-600 font-medium mb-2">Soothes & Calms</p>
-                        <p class="text-xs text-botanical-700 leading-relaxed">Reduces redness, calms skin inflammation, and provides a soothing aromatherapeutic effect.</p>
-                    </div>
-
-                    <!-- Ingredient 3 -->
-                    <div class="bg-white rounded-2xl p-6 border border-gold-300/20 shadow-soft hover:shadow-glow hover:-translate-y-1 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-gold-100 flex items-center justify-center text-gold-600 mb-4 text-xl">
-                            <i class="fa-solid fa-droplet"></i>
-                        </div>
-                        <h3 class="font-serif-title text-xl font-semibold text-botanical-900">Jasmine Elixir</h3>
-                        <p class="text-xs text-gold-600 font-medium mb-2">Radiance & Elasticity</p>
-                        <p class="text-xs text-botanical-700 leading-relaxed">Restores skin barrier elasticity, locks in moisture, and imparts a natural luminous glow.</p>
-                    </div>
-
-                    <!-- Ingredient 4 -->
-                    <div class="bg-white rounded-2xl p-6 border border-gold-300/20 shadow-soft hover:shadow-glow hover:-translate-y-1 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-gold-100 flex items-center justify-center text-gold-600 mb-4 text-xl">
-                            <i class="fa-solid fa-leaf"></i>
-                        </div>
-                        <h3 class="font-serif-title text-xl font-semibold text-botanical-900">Green Tea Extract</h3>
-                        <p class="text-xs text-gold-600 font-medium mb-2">Antioxidant Shield</p>
-                        <p class="text-xs text-botanical-700 leading-relaxed">Protects against environmental pollution, tightens pores, and refreshes tired skin.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Customer Reviews Section -->
-        <section id="reviews" class="py-20 bg-botanical-900 text-white relative overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
-                    <span class="text-xs uppercase tracking-widest text-gold-400 font-semibold">Real Stories</span>
-                    <h2 class="font-serif-title text-3xl sm:text-5xl font-light">Loved by Glowing Skins</h2>
-                    <p class="text-sm text-botanical-200">See what our community has to say about Eloria's botanical remedies.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Review 1 -->
-                    <div class="bg-botanical-800/80 p-8 rounded-2xl border border-gold-400/20 space-y-4">
-                        <div class="text-gold-400 text-sm">★★★★★</div>
-                        <p class="text-sm text-botanical-100 italic leading-relaxed">"The Elixir of Radiance serum changed my skin in just two weeks! My complexion is visibly smoother and has this natural, healthy glow."</p>
-                        <div class="flex items-center gap-3 pt-2">
-                            <div class="w-10 h-10 rounded-full bg-gold-400/20 flex items-center justify-center text-gold-300 font-serif font-bold">
-                                S
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-white">Sophia Martinez</h4>
-                                <p class="text-xs text-botanical-300">Verified Buyer • New York</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Review 2 -->
-                    <div class="bg-botanical-800/80 p-8 rounded-2xl border border-gold-400/20 space-y-4">
-                        <div class="text-gold-400 text-sm">★★★★★</div>
-                        <p class="text-sm text-botanical-100 italic leading-relaxed">"Finally a natural brand that actually delivers luxury results. The Velvet Hydrating Cream smells like a serene flower garden."</p>
-                        <div class="flex items-center gap-3 pt-2">
-                            <div class="w-10 h-10 rounded-full bg-gold-400/20 flex items-center justify-center text-gold-300 font-serif font-bold">
-                                E
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-white">Emma Watson</h4>
-                                <p class="text-xs text-botanical-300">Verified Buyer • London</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Review 3 -->
-                    <div class="bg-botanical-800/80 p-8 rounded-2xl border border-gold-400/20 space-y-4">
-                        <div class="text-gold-400 text-sm">★★★★★</div>
-                        <p class="text-sm text-botanical-100 italic leading-relaxed">"The Rosehip Glow Oil is my holy grail night serum now. Lightweight, non-greasy, and incredibly hydrating."</p>
-                        <div class="flex items-center gap-3 pt-2">
-                            <div class="w-10 h-10 rounded-full bg-gold-400/20 flex items-center justify-center text-gold-300 font-serif font-bold">
-                                L
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-white">Laila Al-Mansoor</h4>
-                                <p class="text-xs text-botanical-300">Verified Buyer • Dubai</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Newsletter Section -->
-        <section class="py-20 bg-gold-100/60 border-t border-gold-300/30">
-            <div class="max-w-4xl mx-auto px-4 text-center space-y-6">
-                <span class="text-xs uppercase tracking-widest text-gold-600 font-semibold">Join The Eloria Club</span>
-                <h2 class="font-serif-title text-3xl sm:text-5xl font-light text-botanical-900">Receive 10% Off Your First Order</h2>
-                <p class="text-sm text-botanical-700 max-w-md mx-auto">Subscribe to get secret botanical tips, early access to new elixir launches, and special offers.</p>
-                
-                <form onsubmit="event.preventDefault(); showToast('Subscribed!', 'Welcome to Eloria Beauty Club.');" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto pt-2">
-                    <input type="email" placeholder="Enter your email address" required class="flex-grow px-5 py-3.5 rounded-full border border-gold-300/60 focus:outline-none focus:border-gold-600 text-sm">
-                    <button type="submit" class="px-8 py-3.5 rounded-full gold-bg-gradient text-botanical-900 font-semibold text-sm shadow hover:scale-[1.02] transition-transform">
-                        Subscribe
+                    <button @click="checkoutModalOpen = true; cartOpen = false" 
+                            class="w-full py-3.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        <span>متابعة إتمام الطلب</span>
+                        <i class="fas fa-arrow-left text-xs"></i>
                     </button>
-                </form>
-            </div>
-        </section>
-    </main>
+                </div>
 
-    <!-- Cart Drawer Slide-out -->
-    <div id="cart-drawer-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity duration-300"></div>
-    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-cream z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl border-l border-gold-300/30">
-        <!-- Cart Header -->
-        <div class="p-6 border-b border-gold-300/30 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-bag-shopping text-gold-600"></i>
-                <h3 class="font-serif-title text-2xl font-semibold text-botanical-900">Your Shopping Bag</h3>
             </div>
-            <button id="close-cart-btn" class="text-botanical-700 hover:text-botanical-900 text-xl p-2">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <!-- Free Shipping Progress -->
-        <div class="bg-botanical-100 p-4 border-b border-gold-300/20 text-xs">
-            <p id="shipping-text" class="text-botanical-800 font-medium mb-1">Add $75.00 more to get FREE shipping!</p>
-            <div class="w-full h-2 bg-white rounded-full overflow-hidden">
-                <div id="shipping-bar" class="h-full gold-bg-gradient transition-all duration-300" style="width: 0%;"></div>
-            </div>
-        </div>
-
-        <!-- Cart Items List -->
-        <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4">
-            <!-- Items populated by JS -->
-        </div>
-
-        <!-- Cart Footer -->
-        <div class="p-6 border-t border-gold-300/30 bg-white space-y-4">
-            <div class="flex justify-between items-center text-sm font-medium">
-                <span class="text-botanical-700">Subtotal</span>
-                <span id="cart-subtotal" class="font-serif-title text-xl font-bold text-botanical-900">$0.00</span>
-            </div>
-            <p class="text-xs text-botanical-600">Taxes and shipping calculated at checkout.</p>
-            <button onclick="checkout()" class="w-full py-4 rounded-full gold-bg-gradient text-botanical-900 font-semibold shadow-glow hover:brightness-105 transition-all text-center">
-                Proceed to Checkout
-            </button>
         </div>
     </div>
 
-    <!-- Footer Section -->
-    <footer class="bg-botanical-900 text-botanical-200 border-t border-gold-400/20 pt-16 pb-8">
+    <div x-show="checkoutModalOpen" class="relative z-50" x-cloak>
+        <div x-show="checkoutModalOpen" x-transition.opacity class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="checkoutModalOpen = false"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-3xl bg-white text-right shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg p-6 sm:p-8">
+                    
+                    <button @click="checkoutModalOpen = false" class="absolute top-5 left-5 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+
+                    <h3 class="text-xl font-extrabold text-gray-800 mb-1 flex items-center gap-2">
+                        <i class="fas fa-clipboard-check text-rose-500"></i> إتمام الطلب
+                    </h3>
+                    <p class="text-xs text-gray-500 mb-6">يرجى إدخال بيانات التوصيل لإكمال طلبك بنجاح</p>
+
+                    <form @submit.prevent="submitOrder" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">الاسم بالكامل</label>
+                            <input type="text" x-model="checkoutForm.name" required placeholder="مثال: أمل أحمد" 
+                                   class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">رقم الهاتف</label>
+                            <input type="tel" x-model="checkoutForm.phone" required placeholder="01xxxxxxxxx" 
+                                   class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">عنوان التوصيل التفصيلي</label>
+                            <textarea x-model="checkoutForm.address" required rows="2" placeholder="اسم الشارع، رقم المبنى، الشقة، المدينة" 
+                                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">طريقة الدفع</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="border rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-rose-50" :class="checkoutForm.payment === 'cod' ? 'border-rose-500 bg-rose-50/50' : 'border-gray-200'">
+                                    <input type="radio" x-model="checkoutForm.payment" value="cod" class="text-rose-500">
+                                    <span class="text-xs font-bold text-gray-700">الدفع عند الاستلام</span>
+                                </label>
+                                <label class="border rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-rose-50" :class="checkoutForm.payment === 'card' ? 'border-rose-500 bg-rose-50/50' : 'border-gray-200'">
+                                    <input type="radio" x-model="checkoutForm.payment" value="card" class="text-rose-500">
+                                    <span class="text-xs font-bold text-gray-700">بطاقة ائتمان</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-gray-100">
+                            <div class="flex justify-between text-sm font-bold text-gray-800 mb-4">
+                                <span>المبلغ الإجمالي المترتب:</span>
+                                <span class="text-rose-600" x-text="cartTotal + ' ج.م'"></span>
+                            </div>
+
+                            <button type="submit" 
+                                    class="w-full py-3.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-2xl shadow-lg transition-all">
+                                تأكيد الطلب الآن
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="quickViewModalOpen" class="relative z-50" x-cloak>
+        <div x-show="quickViewModalOpen" x-transition.opacity class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="quickViewModalOpen = false"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div x-show="selectedProduct !== null" 
+                     class="relative transform overflow-hidden rounded-3xl bg-white text-right shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl p-6 sm:p-8">
+                    
+                    <button @click="quickViewModalOpen = false" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 z-10">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+
+                    <template x-if="selectedProduct">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+                            <div class="relative bg-rose-50 rounded-2xl overflow-hidden h-64 sm:h-80">
+                                <img :src="selectedProduct.image" :alt="selectedProduct.title" class="w-full h-full object-cover">
+                            </div>
+
+                            <div class="space-y-3">
+                                <span class="text-xs font-bold text-rose-500 bg-rose-50 px-2.5 py-1 rounded-full" x-text="getCategoryLabel(selectedProduct.category)"></span>
+                                <h3 class="text-xl font-extrabold text-gray-800" x-text="selectedProduct.title"></h3>
+                                
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl font-extrabold text-rose-600" x-text="selectedProduct.price + ' ج.م'"></span>
+                                    <template x-if="selectedProduct.originalPrice">
+                                        <span class="text-xs text-gray-400 line-through" x-text="selectedProduct.originalPrice + ' ج.م'"></span>
+                                    </template>
+                                </div>
+
+                                <p class="text-xs text-gray-600 leading-relaxed" x-text="selectedProduct.description"></p>
+
+                                <div class="border-t border-gray-100 pt-3 space-y-2">
+                                    <p class="text-xs font-bold text-gray-800"><i class="fas fa-vial text-rose-400 ml-1"></i> المكونات الرئيسية:</p>
+                                    <p class="text-xs text-gray-500" x-text="selectedProduct.ingredients"></p>
+                                </div>
+
+                                <div class="border-t border-gray-100 pt-3 space-y-2">
+                                    <p class="text-xs font-bold text-gray-800"><i class="fas fa-hand-holding-droplet text-rose-400 ml-1"></i> طريقة الاستخدام:</p>
+                                    <p class="text-xs text-gray-500" x-text="selectedProduct.usage"></p>
+                                </div>
+
+                                <button @click="addToCart(selectedProduct); quickViewModalOpen = false" 
+                                        class="w-full mt-4 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-2xl shadow-md transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span>إضافة إلى السلة</span>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="toast.show" x-transition 
+         class="fixed bottom-5 right-5 z-50 bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3" x-cloak>
+        <i class="fas fa-check-circle text-mint-500 text-lg"></i>
+        <span class="text-xs sm:text-sm font-bold" x-text="toast.message"></span>
+    </div>
+
+    <footer class="bg-gray-900 text-gray-300 pt-16 pb-8 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-botanical-800">
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
                 
+                <!-- Brand Info -->
                 <div class="space-y-4">
                     <a href="#" class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full gold-bg-gradient flex items-center justify-center text-botanical-900 font-serif font-bold text-lg">
-                            E
+                        <div class="w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center text-white font-bold">
+                            <i class="fas fa-sparkles text-sm"></i>
                         </div>
-                        <span class="font-serif-title text-2xl font-semibold tracking-wide text-white">
-                            Eloria <span class="text-gold-400 italic font-normal">Beauty</span>
-                        </span>
+                        <span class="text-xl font-black text-white font-tajawal">جلو سكين</span>
                     </a>
-                    <p class="text-xs text-botanical-300 leading-relaxed">
-                        Crafting timeless organic elixirs from pure botanical remedies for glowing, radiant skin.
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        عالمك الخاص للعناية بالبشرة وبناء روتينك اليومي بمكونات آمنة وطبيعية لتعزيز إشراقة وجهك ونضارته.
                     </p>
-                    <div class="flex space-x-4 text-gold-400 text-lg">
-                        <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-pinterest"></i></a>
-                        <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-tiktok"></i></a>
+                    <div class="flex gap-3 text-gray-400 pt-2">
+                        <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-colors"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-colors"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-colors"><i class="fab fa-tiktok"></i></a>
                     </div>
                 </div>
 
+                <!-- Quick Links -->
                 <div>
-                    <h4 class="font-serif-title text-lg text-white font-medium mb-4">Shop Collections</h4>
-                    <ul class="space-y-2 text-xs text-botanical-300">
-                        <li><a href="#shop" class="hover:text-gold-400 transition-colors">Radiance Serums</a></li>
-                        <li><a href="#shop" class="hover:text-gold-400 transition-colors">Botanical Oils</a></li>
-                        <li><a href="#shop" class="hover:text-gold-400 transition-colors">Hydrating Creams</a></li>
-                        <li><a href="#shop" class="hover:text-gold-400 transition-colors">Rejuvenating Masks</a></li>
+                    <h4 class="text-white font-bold text-sm mb-4">روابط سريعة</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#featured" class="hover:text-rose-400 transition-colors">الرئيسية</a></li>
+                        <li><a href="#products" class="hover:text-rose-400 transition-colors">جميع المنتجات</a></li>
+                        <li><a href="#quiz" class="hover:text-rose-400 transition-colors">اختبار تحديد نوع البشرة</a></li>
+                        <li><a href="#" class="hover:text-rose-400 transition-colors">العروض والتخفيضات</a></li>
                     </ul>
                 </div>
 
+                <!-- Customer Care -->
                 <div>
-                    <h4 class="font-serif-title text-lg text-white font-medium mb-4">Company</h4>
-                    <ul class="space-y-2 text-xs text-botanical-300">
-                        <li><a href="#about" class="hover:text-gold-400 transition-colors">Our Story</a></li>
-                        <li><a href="#ingredients" class="hover:text-gold-400 transition-colors">Sustainable Sourcing</a></li>
-                        <li><a href="#" class="hover:text-gold-400 transition-colors">Careers</a></li>
-                        <li><a href="#" class="hover:text-gold-400 transition-colors">Press & Awards</a></li>
+                    <h4 class="text-white font-bold text-sm mb-4">خدمة العملاء</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" class="hover:text-rose-400 transition-colors">سياسة الشحن والتوصيل</a></li>
+                        <li><a href="#" class="hover:text-rose-400 transition-colors">الإرجاع والاستبدال</a></li>
+                        <li><a href="#" class="hover:text-rose-400 transition-colors">الأسئلة الشائعة</a></li>
+                        <li><a href="#" class="hover:text-rose-400 transition-colors">تواصل معنا</a></li>
                     </ul>
                 </div>
 
+                <!-- Newsletter -->
                 <div>
-                    <h4 class="font-serif-title text-lg text-white font-medium mb-4">Customer Care</h4>
-                    <ul class="space-y-2 text-xs text-botanical-300">
-                        <li><a href="#" class="hover:text-gold-400 transition-colors">Contact Us</a></li>
-                        <li><a href="#" class="hover:text-gold-400 transition-colors">Shipping & Returns</a></li>
-                        <li><a href="#" class="hover:text-gold-400 transition-colors">FAQ</a></li>
-                        <li><a href="#" class="hover:text-gold-400 transition-colors">Privacy Policy</a></li>
-                    </ul>
+                    <h4 class="text-white font-bold text-sm mb-2">النشرة البريدية</h4>
+                    <p class="text-xs text-gray-400 mb-4">اشتركي للحصول على نصائح للعناية بالبشرة وخصم 10% على أول طلب.</p>
+                    <form @submit.prevent="showToast('تم اشتراكك بنجاح في النشرة البريدية!')" class="space-y-2">
+                        <input type="email" required placeholder="بريدك الإلكتروني" 
+                               class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-xs text-white focus:outline-none focus:ring-1 focus:ring-rose-400">
+                        <button type="submit" class="w-full py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all">
+                            اشتركي الآن
+                        </button>
+                    </form>
                 </div>
 
             </div>
 
-            <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-botanical-400 gap-4">
-                <p>© 2026 Eloria Beauty. All rights reserved. Crafted with care.</p>
-                <div class="flex items-center space-x-4">
-                    <i class="fa-brands fa-cc-visa text-lg"></i>
-                    <i class="fa-brands fa-cc-mastercard text-lg"></i>
-                    <i class="fa-brands fa-cc-apple-pay text-lg"></i>
-                    <i class="fa-brands fa-cc-paypal text-lg"></i>
+            <!-- Copyright Footer -->
+            <div class="pt-8 border-t border-gray-800 text-center text-xs text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p>© 2026 جميع الحقوق محفوظة لمتجر جلو سكين (Glow SkinCare).</p>
+                <div class="flex gap-4">
+                    <i class="fab fa-cc-visa text-lg text-gray-400"></i>
+                    <i class="fab fa-cc-mastercard text-lg text-gray-400"></i>
+                    <i class="fas fa-money-bill-wave text-lg text-gray-400"></i>
                 </div>
             </div>
+
         </div>
     </footer>
 
     <script>
-        // Data Store
-        const products = [
-            {
-                id: 'p1',
-                name: 'Elixir of Radiance Serum',
-                category: 'serum',
-                price: 48.00,
-                rating: '4.9 ★★★★★',
-                badge: 'Bestseller',
-                image: 'https://images.unsplash.com/photo-1608248597266-c89a9f99e436?auto=format&fit=crop&w=600&q=80',
-                desc: 'Infused with cold-pressed rosehip and hyaluronic acid.'
-            },
-            {
-                id: 'p2',
-                name: 'Rosehip Glow Botanical Oil',
-                category: 'mask',
-                price: 52.00,
-                rating: '4.8 ★★★★★',
-                badge: 'New Formula',
-                image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80',
-                desc: 'Nutrient-rich facial oil for intense nightly nourishment.'
-            },
-            {
-                id: 'p3',
-                name: 'Velvet Hydrating Cream',
-                category: 'moisturizer',
-                price: 42.00,
-                rating: '5.0 ★★★★★',
-                badge: 'Popular',
-                image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=600&q=80',
-                desc: 'Lightweight botanical cream for 24-hour hydration.'
-            },
-            {
-                id: 'p4',
-                name: 'Botanical Rejuvenating Mask',
-                category: 'mask',
-                price: 38.00,
-                rating: '4.9 ★★★★★',
-                badge: 'Organic',
-                image: 'https://images.unsplash.com/photo-1567928269937-ae146e45b428?auto=format&fit=crop&w=600&q=80',
-                desc: 'Detoxifying clay mask with soothing green tea.'
-            }
-        ];
+        function shopApp() {
+            return {
+                mobileMenuOpen: false,
+                cartOpen: false,
+                checkoutModalOpen: false,
+                quickViewModalOpen: false,
+                searchQuery: '',
+                selectedCategory: 'all',
+                quizSkinType: null,
+                selectedProduct: null,
+                
+                toast: {
+                    show: false,
+                    message: ''
+                },
 
-        let cart = [];
-        let wishlist = new Set();
+                checkoutForm: {
+                    name: '',
+                    phone: '',
+                    address: '',
+                    payment: 'cod'
+                },
 
-        // Initialize Web App
-        window.onload = function() {
-            renderProducts('all');
-            setupEventListeners();
-        };
+                cart: [],
 
-        // Render Products Grid
-        function renderProducts(category) {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
+                // Skin Types for Quiz
+                skinTypes: [
+                    { id: 'oily', name: 'بشرة دهنية', icon: '✨', desc: 'إفرازات زهمية ولمعان مستمر' },
+                    { id: 'dry', name: 'بشرة جافة', icon: '💧', desc: 'شعور بالشد والجفاف أو التقشير' },
+                    { id: 'combination', name: 'بشرة مختلطة', icon: '⚖️', desc: 'دهنية في منطقة T-Zone وجافة في باقي الوجه' },
+                    { id: 'sensitive', name: 'بشرة حساسة', icon: '🌸', desc: 'سريعة التأثر والتنمل والاحمرار' }
+                ],
 
-            const filtered = category === 'all' 
-                ? products 
-                : products.filter(p => p.category === category);
+                // Skincare Products Dataset
+                products: [
+                    {
+                        id: 1,
+                        title: "سيروم الهيالورونيك أسيد الفائق",
+                        category: "serum",
+                        price: 280,
+                        originalPrice: 350,
+                        discount: 20,
+                        rating: 4.9,
+                        reviewsCount: 128,
+                        isBestSeller: true,
+                        skinType: ["dry", "combination", "sensitive"],
+                        image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80",
+                        benefits: "يحتوي على 2% هيالورونيك أسيد نقي لترطيب عميق ومد يد العون للبشرة المجهدة.",
+                        description: "سيروم مكثف يعمل على اختراق طبقات البشرة لترطيبها وتعبئة الخطوط الدقيقة، مما يمنحها ملمساً ناعماً وإشراقة تدوم طويلاً.",
+                        ingredients: "هيالورونيك أسيد، فيتامين B5، ماء ورد طبيعي، جليسرين نباتي.",
+                        usage: "ضعي 3-4 قطرات على بشرة نظيفة ورطبة قليلاً صباحاً ومساءً قبل الكريم المرطب."
+                    },
+                    {
+                        id: 2,
+                        title: "غسول الوجه برغوة النياسيناميد",
+                        category: "face",
+                        price: 190,
+                        originalPrice: null,
+                        discount: null,
+                        rating: 4.7,
+                        reviewsCount: 95,
+                        isBestSeller: false,
+                        skinType: ["oily", "combination"],
+                        image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80",
+                        benefits: "ينظف المسام بلقاء ويتحكم في إفراز الزيوت دون إرجاع جفاف البشرة.",
+                        description: "غسول لطيف على البشرة ينظف الأوساخ والترسبات اليومية مع تقليل ظهور المسام الواسعة بفضل مادة النياسيناميد.",
+                        ingredients: "نياسيناميد 5%، مستخلص الشاي الأخضر، أحماض الفواكه المخففة.",
+                        usage: "دلكي كمية صغرى على وجه مبلل بحركات دائرية ثم اشطفيه بماء فاتر."
+                    },
+                    {
+                        id: 3,
+                        title: "واقي الشمس المرطب SPF 50+",
+                        category: "sunscreen",
+                        price: 320,
+                        originalPrice: 380,
+                        discount: 15,
+                        rating: 5.0,
+                        reviewsCount: 210,
+                        isBestSeller: true,
+                        skinType: ["oily", "dry", "combination", "sensitive"],
+                        image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=600&q=80",
+                        benefits: "حماية فائقة من أشعة الشمس الضارة UVA/UVB بدون ترك أي أثر أبيض.",
+                        description: "تركيبة مائية خفيفة سريعة الامتصاص تحمي البشرة من التصبغات والتجاعيد المبكرة الناتجة عن التعرض للشمس.",
+                        ingredients: "أكسيد الزنك، فيتامين E، مستخلص الصبار التايلاندي.",
+                        usage: " يوضع قبل التعرض للشمس بـ 15 دقيقة، ويجدد كل ساعتين."
+                    },
+                    {
+                        id: 4,
+                        title: "كريم الترطيب المكثف بسيراميد",
+                        category: "face",
+                        price: 260,
+                        originalPrice: 300,
+                        discount: 13,
+                        rating: 4.8,
+                        reviewsCount: 84,
+                        isBestSeller: false,
+                        skinType: ["dry", "sensitive"],
+                        image: "https://images.unsplash.com/photo-1608248597262-83813936644f?auto=format&fit=crop&w=600&q=80",
+                        benefits: "يعيد بناء حاجز البشرة الواقي ويعالج الجفاف الشديد والتهيج.",
+                        description: "كريم غني بالسيراميد وزبدة الشيا يمنحك راحة فورية وترطيباً يدوم 24 ساعة بدون حساسية.",
+                        ingredients: "سيراميد NP، زبدة الشيا العضوية، زيت الأرجان.",
+                        usage: "يُدهن على الوجه والرقبة مرتين يومياً بعد السيروم."
+                    },
+                    {
+                        id: 5,
+                        title: "سيروم فيتامين C المشرق",
+                        category: "serum",
+                        price: 340,
+                        originalPrice: 400,
+                        discount: 15,
+                        rating: 4.9,
+                        reviewsCount: 160,
+                        isBestSeller: true,
+                        skinType: ["dry", "combination"],
+                        image: "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=600&q=80",
+                        benefits: "يفتح البقع الداكنة ويوحد لون البشرة ليمنحها إشراقة زجاجية.",
+                        description: "تركيبة مركزة بفيتامين سي النشط ومضادات الأكسدة لمحاربة الشحوب وإعادة الحيوية والنضارة للوجه.",
+                        ingredients: "فيتامين C نقي 15%، حمض فيروليك، خلاصة البرتقال.",
+                        usage: "توضع 3 قطرات صباحاً قبل واقي الشمس تجنباً للأكسدة."
+                    },
+                    {
+                        id: 6,
+                        title: "مقشر وملمع الجسم بملح الهيمالايا",
+                        category: "body",
+                        price: 210,
+                        originalPrice: null,
+                        discount: null,
+                        rating: 4.6,
+                        reviewsCount: 42,
+                        isBestSeller: false,
+                        skinType: ["dry", "combination", "oily"],
+                        image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=80",
+                        benefits: "يزيل الخلايا الميتة وينعم الجلد ويتركه برائحة الورد الخزامى الفواحة.",
+                        description: "مقشر طبيعي مدعم بزيوت المرطبة يزيل الجلد الميت وينشط الدورة الدموية للحصول على ملمس حريري.",
+                        ingredients: "أملاح الهيمالايا الوردي، زيت اللوز الحلو، زيت اللافندر العطري.",
+                        usage: "يستخدم مرتين أسبوعياً على جسم مبلل بحركات دائرية ثم يشطف."
+                    }
+                ],
 
-            filtered.forEach(p => {
-                const isWishlist = wishlist.has(p.id);
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-3xl overflow-hidden border border-gold-300/20 shadow-soft hover:shadow-xl transition-all duration-300 group flex flex-col justify-between';
-                card.innerHTML = `
-                    <div>
-                        <div class="relative overflow-hidden bg-sand h-64">
-                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x600/3e5c46/d8b975?text=${encodeURIComponent(p.name)}'">
-                            <span class="absolute top-4 left-4 bg-gold-500 text-botanical-900 text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full">${p.badge}</span>
-                            <button onclick="toggleWishlist('${p.id}')" class="absolute top-4 right-4 w-9 h-9 rounded-full glass-card flex items-center justify-center text-botanical-800 hover:text-red-500 transition-colors">
-                                <i class="${isWishlist ? 'fa-solid text-red-500' : 'fa-regular'} fa-heart"></i>
-                            </button>
-                        </div>
-                        <div class="p-6 space-y-2">
-                            <span class="text-xs text-gold-600">${p.rating}</span>
-                            <h3 class="font-serif-title text-xl font-semibold text-botanical-900 group-hover:text-gold-600 transition-colors">${p.name}</h3>
-                            <p class="text-xs text-botanical-700/80 leading-relaxed">${p.desc}</p>
-                        </div>
-                    </div>
-                    <div class="px-6 pb-6 pt-2 flex items-center justify-between border-t border-gold-100">
-                        <span class="font-serif-title text-2xl font-bold text-botanical-900">$${p.price.toFixed(2)}</span>
-                        <button onclick="addToCart('${p.id}')" class="px-4 py-2.5 rounded-full gold-bg-gradient text-botanical-900 text-xs font-semibold hover:shadow transition-all flex items-center gap-1.5">
-                            <i class="fa-solid fa-plus text-xs"></i> Add to Bag
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
+                // Filtered Products Computed Logic
+                get filteredProducts() {
+                    return this.products.filter(product => {
+                        const matchesCategory = this.selectedCategory === 'all' || product.category === this.selectedCategory;
+                        const matchesSearch = product.title.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                                              product.benefits.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        return matchesCategory && matchesSearch;
+                    });
+                },
 
-        // Filter Functionality
-        function filterProducts(cat) {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('bg-botanical-800', 'text-white');
-                btn.classList.add('bg-white', 'text-botanical-800');
-            });
-            event.target.classList.remove('bg-white', 'text-botanical-800');
-            event.target.classList.add('bg-botanical-800', 'text-white');
-            renderProducts(cat);
-        }
+                // Cart Computations
+                get cartCount() {
+                    return this.cart.reduce((total, item) => total + item.quantity, 0);
+                },
 
-        // Cart Actions
-        function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            const existing = cart.find(item => item.id === productId);
+                get cartSubtotal() {
+                    return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+                },
 
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                cart.push({ ...product, qty: 1 });
-            }
+                get cartTotal() {
+                    const shipping = this.cartSubtotal >= 350 || this.cartSubtotal === 0 ? 0 : 35;
+                    return this.cartSubtotal + shipping;
+                },
 
-            updateCartUI();
-            showToast('Added to Bag!', `${product.name} is now in your shopping bag.`);
-        }
+                // Actions
+                addToCart(product) {
+                    const existing = this.cart.find(item => item.id === product.id);
+                    if (existing) {
+                        existing.quantity++;
+                    } else {
+                        this.cart.push({
+                            id: product.id,
+                            title: product.title,
+                            price: product.price,
+                            image: product.image,
+                            quantity: 1
+                        });
+                    }
+                    this.showToast(`تمت إضافة "${product.title}" إلى السلة`);
+                },
 
-        function updateQty(id, delta) {
-            const item = cart.find(i => i.id === id);
-            if (item) {
-                item.qty += delta;
-                if (item.qty <= 0) {
-                    cart = cart.filter(i => i.id !== id);
+                updateQuantity(productId, delta) {
+                    const item = this.cart.find(i => i.id === productId);
+                    if (item) {
+                        item.quantity += delta;
+                        if (item.quantity <= 0) {
+                            this.removeFromCart(productId);
+                        }
+                    }
+                },
+
+                removeFromCart(productId) {
+                    this.cart = this.cart.filter(item => item.id !== productId);
+                    this.showToast("تم إزالة المنتج من السلة");
+                },
+
+                openQuickView(product) {
+                    this.selectedProduct = product;
+                    this.quickViewModalOpen = true;
+                },
+
+                getCategoryLabel(category) {
+                    const labels = {
+                        face: 'العناية بالوجه',
+                        serum: 'سيروم ورطوبة',
+                        sunscreen: 'واقي الشمس',
+                        body: 'العناية بالجسم'
+                    };
+                    return labels[category] || 'عام';
+                },
+
+                getSkinTypeName(typeId) {
+                    const type = this.skinTypes.find(t => t.id === typeId);
+                    return type ? type.name : '';
+                },
+
+                getSkinTypeAdvice(typeId) {
+                    const advice = {
+                        oily: 'تحتاج بشرتك إلى غسول لطيف ينظم الإفرازات الدهنية مع سيروم مرطب خفيف قائم على الماء.',
+                        dry: 'تستفيد بشرتك من السيروم المعزز بالهيالورونيك والكريمات الغنية بالسيراميد لحمايتها من التغرق.',
+                        combination: 'الخيار الأفضل لبشرتك هو تنظيم مناطق T-Zone مع ترطيب متوازن ومستهدف.',
+                        sensitive: 'البشرة الحساسة تتطلب تركيبة خالية من المعطرات مع واقي شمس معدني ومكونات مهدئة.'
+                    };
+                    return advice[typeId] || '';
+                },
+
+                getRecommendedProducts(typeId) {
+                    if (!typeId) return [];
+                    return this.products.filter(p => p.skinType.includes(typeId));
+                },
+
+                filterBySkinType(typeId) {
+                    this.selectedCategory = 'all';
+                    this.searchQuery = '';
+                    const section = document.getElementById('products');
+                    if (section) section.scrollIntoView({ behavior: 'smooth' });
+                },
+
+                submitOrder() {
+                    if (this.cart.length === 0) return;
+                    this.checkoutModalOpen = false;
+                    this.cart = [];
+                    this.showToast("شكراً لك! تم استلام طلبك بنجاح وسنتواصل معك قريباً.");
+                },
+
+                showToast(msg) {
+                    this.toast.message = msg;
+                    this.toast.show = true;
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 3500);
                 }
             }
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            const cartCount = document.getElementById('cart-count');
-            const cartItems = document.getElementById('cart-items');
-            const subtotalElem = document.getElementById('cart-subtotal');
-            const shippingBar = document.getElementById('shipping-bar');
-            const shippingText = document.getElementById('shipping-text');
-
-            const totalItems = cart.reduce((sum, i) => sum + i.qty, 0);
-            const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-
-            cartCount.innerText = totalItems;
-
-            // Render Cart Items
-            if (cart.length === 0) {
-                cartItems.innerHTML = `
-                    <div class="text-center py-12 space-y-3">
-                        <i class="fa-solid fa-leaf text-4xl text-botanical-300"></i>
-                        <p class="text-sm text-botanical-700">Your shopping bag is empty.</p>
-                        <a href="#shop" onclick="toggleCartDrawer(false)" class="inline-block text-xs text-gold-600 font-semibold underline">Explore Botanicals</a>
-                    </div>
-                `;
-            } else {
-                cartItems.innerHTML = cart.map(item => `
-                    <div class="flex items-center gap-4 bg-white p-3 rounded-2xl border border-gold-200">
-                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-xl object-cover">
-                        <div class="flex-grow space-y-1">
-                            <h4 class="text-xs font-semibold text-botanical-900">${item.name}</h4>
-                            <p class="text-xs font-bold text-gold-600">$${item.price.toFixed(2)}</p>
-                            <div class="flex items-center gap-2 text-xs">
-                                <button onclick="updateQty('${item.id}', -1)" class="w-5 h-5 rounded bg-botanical-100 flex items-center justify-center font-bold">-</button>
-                                <span>${item.qty}</span>
-                                <button onclick="updateQty('${item.id}', 1)" class="w-5 h-5 rounded bg-botanical-100 flex items-center justify-center font-bold">+</button>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            subtotalElem.innerText = `$${subtotal.toFixed(2)}`;
-
-            // Shipping Progress
-            const freeShippingThreshold = 75;
-            const progress = Math.min((subtotal / freeShippingThreshold) * 100, 100);
-            shippingBar.style.width = `${progress}%`;
-
-            if (subtotal >= freeShippingThreshold) {
-                shippingText.innerText = "🎉 You've unlocked FREE Worldwide Shipping!";
-            } else {
-                const remaining = (freeShippingThreshold - subtotal).toFixed(2);
-                shippingText.innerText = `Add $${remaining} more to get FREE shipping!`;
-            }
-        }
-
-        // Toggle Wishlist
-        function toggleWishlist(id) {
-            if (wishlist.has(id)) {
-                wishlist.delete(id);
-                showToast('Removed from Wishlist', 'Item removed.');
-            } else {
-                wishlist.add(id);
-                showToast('Saved to Wishlist!', 'Item added to your favorites.');
-            }
-            document.getElementById('wishlist-badge').classList.toggle('hidden', wishlist.size === 0);
-            renderProducts('all');
-        }
-
-        // Event Listeners
-        function setupEventListeners() {
-            const cartBtn = document.getElementById('cart-btn');
-            const closeCartBtn = document.getElementById('close-cart-btn');
-            const overlay = document.getElementById('cart-drawer-overlay');
-            const mobileBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            cartBtn.addEventListener('click', () => toggleCartDrawer(true));
-            closeCartBtn.addEventListener('click', () => toggleCartDrawer(false));
-            overlay.addEventListener('click', () => toggleCartDrawer(false));
-
-            mobileBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
-
-        function toggleCartDrawer(open) {
-            const drawer = document.getElementById('cart-drawer');
-            const overlay = document.getElementById('cart-drawer-overlay');
-
-            if (open) {
-                overlay.classList.remove('hidden');
-                drawer.classList.remove('translate-x-full');
-            } else {
-                overlay.classList.add('hidden');
-                drawer.classList.add('translate-x-full');
-            }
-        }
-
-        // Toast Handler
-        function showToast(title, msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-msg').innerText = msg;
-
-            toast.classList.remove('translate-x-72', 'opacity-0');
-            toast.classList.add('translate-x-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-x-0', 'opacity-100');
-                toast.classList.add('translate-x-72', 'opacity-0');
-            }, 3000);
-        }
-
-        function checkout() {
-            if(cart.length === 0) {
-                showToast('Bag is Empty', 'Please add products before checking out.');
-                return;
-            }
-            showToast('Order Placed!', 'Thank you for shopping with Eloria Beauty.');
-            cart = [];
-            updateCartUI();
-            toggleCartDrawer(false);
         }
     </script>
 </body>
