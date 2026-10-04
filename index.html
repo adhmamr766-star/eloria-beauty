@@ -665,9 +665,9 @@
                                 <span class="text-rose-600" x-text="cartTotal + ' ج.م'"></span>
                             </div>
 
-                            <button type="submit" 
-                                    class="w-full py-3.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-2xl shadow-lg transition-all">
-                                تأكيد الطلب الآن
+                            <button type="submit" :disabled="isSubmitting"
+                                    class="w-full py-3.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                                <span x-text="isSubmitting ? 'جاري إرسال الطلب...' : 'تأكيد الطلب الآن'"></span>
                             </button>
                         </div>
                     </form>
@@ -818,10 +818,15 @@
                 cartOpen: false,
                 checkoutModalOpen: false,
                 quickViewModalOpen: false,
+                isSubmitting: false,
                 searchQuery: '',
                 selectedCategory: 'all',
                 quizSkinType: null,
                 selectedProduct: null,
+
+                // Telegram Bot Configs
+                TELEGRAM_BOT_TOKEN: '8583483981:AAEm4dpt36eUyt3yS2lM9lR9E3x8z11P38E',
+                TELEGRAM_CHAT_ID: '7681285090',
                 
                 toast: {
                     show: false,
@@ -1049,11 +1054,64 @@
                     if (section) section.scrollIntoView({ behavior: 'smooth' });
                 },
 
-                submitOrder() {
+                async submitOrder() {
                     if (this.cart.length === 0) return;
-                    this.checkoutModalOpen = false;
-                    this.cart = [];
-                    this.showToast("شكراً لك! تم استلام طلبك بنجاح وسنتواصل معك قريباً.");
+
+                    this.isSubmitting = true;
+
+                    // Build Telegram Message
+                    let itemsText = this.cart.map((item, index) => {
+                        return `${index + 1}. ${item.title}\n   • الكمية: ${item.quantity}\n   • السعر: ${item.price * item.quantity} ج.م`;
+                    }).join('\n\n');
+
+                    const paymentMethodText = this.checkoutForm.payment === 'cod' ? 'الدفع عند الاستلام' : 'بطاقة ائتمان';
+                    const shippingCostText = this.cartSubtotal >= 350 ? 'مجاني' : '35 ج.م';
+
+                    const message = `🛒 *طلب جديد من متجر Glow SkinCare*
+
+👤 *بيانات العميل:*
+• *الاسم:* ${this.checkoutForm.name}
+• *الهاتف:* ${this.checkoutForm.phone}
+• *العنوان:* ${this.checkoutForm.address}
+• *طريقة الدفع:* ${paymentMethodText}
+
+🛍️ *المنتجات المطلوبة:*
+${itemsText}
+
+💰 *الملخص المالية:*
+• *المجموع الفرعي:* ${this.cartSubtotal} ج.م
+• *الشحن:* ${shippingCostText}
+• *الإجمالي النهائي:* ${this.cartTotal} ج.م`;
+
+                    try {
+                        const response = await fetch(`https://api.telegram.org/bot${this.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                chat_id: this.TELEGRAM_CHAT_ID,
+                                text: message,
+                                parse_mode: 'Markdown'
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.ok) {
+                            this.checkoutModalOpen = false;
+                            this.cart = [];
+                            this.checkoutForm = { name: '', phone: '', address: '', payment: 'cod' };
+                            this.showToast("شكراً لك! تم استلام طلبك بنجاح وسنتواصل معك قريباً.");
+                        } else {
+                            alert("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.");
+                        }
+                    } catch (error) {
+                        console.error("Error submitting order to Telegram:", error);
+                        alert("حدث خطأ في الاتصال بالسيرفر، يرجى التأكد من الإنترنت والمحاولة لاحقاً.");
+                    } finally {
+                        this.isSubmitting = false;
+                    }
                 },
 
                 showToast(msg) {
